@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import { geminiService, geminiProService } from '../services/geminiService';
 import { geminiConfig } from '../config/gemini';
+import { parseRateLimitError } from '../lib/retry';
 
 /**
  * Gemini Controller
@@ -192,6 +193,41 @@ export class GeminiController {
       });
     } catch (error) {
       console.error('Error sending message:', error);
+      
+      // Handle rate limiting errors specifically
+      if (error instanceof Error && error.message.includes('Rate limit exceeded')) {
+        return res.status(429).json({
+          success: false,
+          error: 'Rate limit exceeded',
+          message: error.message,
+          retryAfter: 60 // Default fallback
+        });
+      }
+      
+      // Handle other Gemini API errors
+      if (error && typeof error === 'object' && 'status' in error) {
+        const apiError = error as any;
+        
+        if (apiError.status === 429) {
+          const { retryAfter, quotaType } = parseRateLimitError(apiError);
+          return res.status(429).json({
+            success: false,
+            error: 'Rate limit exceeded',
+            message: `Gemini API quota exceeded (${quotaType}). Please retry in ${retryAfter} seconds.`,
+            retryAfter: retryAfter,
+            quotaType: quotaType
+          });
+        }
+        
+        if (apiError.status >= 500) {
+          return res.status(502).json({
+            success: false,
+            error: 'Service temporarily unavailable',
+            message: 'Gemini API is experiencing issues. Please try again later.'
+          });
+        }
+      }
+      
       res.status(500).json({
         success: false,
         error: 'Failed to send message',

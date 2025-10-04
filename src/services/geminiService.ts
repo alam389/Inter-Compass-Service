@@ -1,5 +1,7 @@
 import { geminiConfig } from '../config/gemini';
 import { GenerativeModel } from '@google/generative-ai';
+import { retryWithBackoff, parseRateLimitError } from '../lib/retry';
+import { geminiQueue } from '../lib/requestQueue';
 
 /**
  * Gemini Service
@@ -7,7 +9,7 @@ import { GenerativeModel } from '@google/generative-ai';
  */
 
 export interface ChatMessage {
-  role: 'user' | 'model';
+  role: 'user' | 'model' | 'assistant';
   parts: string;
 }
 
@@ -42,25 +44,33 @@ class GeminiService {
       throw new Error('Gemini service not properly initialized');
     }
 
-    try {
-      const generationConfig = {
-        temperature: config?.temperature ?? 0.7,
-        topK: config?.topK ?? 40,
-        topP: config?.topP ?? 0.95,
-        maxOutputTokens: config?.maxOutputTokens ?? 1024,
-      };
+    // Use queue to manage rate limiting
+    return geminiQueue.enqueue(async () => {
+      return retryWithBackoff(async () => {
+        const generationConfig = {
+          temperature: config?.temperature ?? 0.7,
+          topK: config?.topK ?? 40,
+          topP: config?.topP ?? 0.95,
+          maxOutputTokens: config?.maxOutputTokens ?? 1024,
+        };
 
-      const result = await this.model.generateContent({
-        contents: [{ role: 'user', parts: [{ text: prompt }] }],
-        generationConfig,
+        const result = await this.model!.generateContent({
+          contents: [{ role: 'user', parts: [{ text: prompt }] }],
+          generationConfig,
+        });
+
+        const response = await result.response;
+        return response.text();
+      }, {
+        maxRetries: 2, // Reduced retries since queue handles spacing
+        baseDelay: 1000,
+        retryCondition: (error: any) => {
+          // Only retry on server errors, not rate limits (queue handles that)
+          if (error.status >= 500) return true;
+          return false;
+        }
       });
-
-      const response = await result.response;
-      return response.text();
-    } catch (error) {
-      console.error('Error generating text with Gemini:', error);
-      throw new Error(`Failed to generate text: ${error}`);
-    }
+    }, 1); // Normal priority
   }
 
   /**
@@ -82,7 +92,25 @@ class GeminiService {
         maxOutputTokens: config?.maxOutputTokens ?? 1024,
       };
 
-      const chatHistory = history.map(msg => ({
+      // Normalize history to satisfy Gemini SDK requirements
+      // - Accept 'assistant' as alias for 'model'
+      // - Drop leading 'model' messages so the first entry is a 'user'
+      // - Remove empty messages
+      const normalized = history
+        .filter(msg => msg && typeof msg.parts === 'string' && msg.parts.trim().length > 0)
+        .map(msg => ({
+          role: msg.role === 'assistant' ? 'model' : msg.role,
+          parts: msg.parts,
+        })) as Array<{ role: 'user' | 'model'; parts: string }>;
+
+      // Trim leading 'model' messages
+      let startIdx = 0;
+      while (startIdx < normalized.length && normalized[startIdx].role !== 'user') {
+        startIdx++;
+      }
+      const trimmed = normalized.slice(startIdx);
+
+      const chatHistory = trimmed.map(msg => ({
         role: msg.role,
         parts: [{ text: msg.parts }]
       }));
@@ -94,9 +122,22 @@ class GeminiService {
 
       return {
         sendMessage: async (message: string) => {
-          const result = await chat.sendMessage(message);
-          const response = await result.response;
-          return response.text();
+          // Use queue to manage rate limiting for chat messages
+          return geminiQueue.enqueue(async () => {
+            return retryWithBackoff(async () => {
+              const result = await chat.sendMessage(message);
+              const response = await result.response;
+              return response.text();
+            }, {
+              maxRetries: 2, // Reduced retries since queue handles spacing
+              baseDelay: 1000,
+              retryCondition: (error: any) => {
+                // Only retry on server errors, not rate limits (queue handles that)
+                if (error.status >= 500) return true;
+                return false;
+              }
+            });
+          }, 1); // Normal priority
         },
         getHistory: () => chat.getHistory()
       };

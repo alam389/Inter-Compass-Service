@@ -4,6 +4,8 @@ import dotenv from 'dotenv';
 import { db } from './database';
 import { geminiConfig } from './config/gemini';
 import geminiRoutes from './routes/gemini';
+import usersRoutes from './routes/users';
+import chatRoutes from './routes/chat';
 import { requestLogger } from './middleware/validation';
 
 // Load environment variables
@@ -40,6 +42,8 @@ app.get('/health', (req, res) => {
 
 // API Routes
 app.use('/api/gemini', geminiRoutes);
+app.use('/api/users', usersRoutes);
+app.use('/api/chat', chatRoutes);
 
 // 404 handler
 app.use((req, res) => {

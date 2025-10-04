@@ -1,6 +1,8 @@
-import { Router } from 'express';
+import { Router, Request, Response } from 'express';
 import { GeminiController } from '../controllers/geminiController';
 import { validateRequest, aiRateLimit, asyncHandler } from '../middleware/validation';
+import { rateLimitMiddleware } from '../middleware/rateLimiter';
+import { geminiQueue } from '../lib/requestQueue';
 
 /**
  * Gemini Routes
@@ -9,8 +11,9 @@ import { validateRequest, aiRateLimit, asyncHandler } from '../middleware/valida
 
 const router = Router();
 
-// Apply AI rate limiting to all routes
+// Apply both general AI rate limiting and specific Gemini rate limiting
 router.use(aiRateLimit);
+router.use(rateLimitMiddleware);
 
 // Base path: /api/gemini
 
@@ -19,6 +22,18 @@ router.use(aiRateLimit);
  * Get Gemini service status and configuration
  */
 router.get('/status', asyncHandler(GeminiController.getStatus));
+
+/**
+ * GET /api/gemini/queue
+ * Get queue status
+ */
+router.get('/queue', asyncHandler(async (req: Request, res: Response) => {
+  const queueStatus = geminiQueue.getStatus();
+  res.json({
+    success: true,
+    data: queueStatus
+  });
+}));
 
 /**
  * GET /api/gemini/test
