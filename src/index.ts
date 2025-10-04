@@ -1,6 +1,7 @@
 import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
+import { db } from './database';
 
 // Load environment variables
 dotenv.config();
@@ -43,6 +44,66 @@ app.get('/api/test', (req, res) => {
   });
 });
 
+// Database test endpoint
+app.get('/api/db/test', async (req, res) => {
+  try {
+    const isConnected = await db.testConnection();
+    const poolStats = db.getPoolStats();
+    
+    res.json({
+      message: 'Database connection test',
+      connected: isConnected,
+      poolStats: poolStats,
+      timestamp: new Date().toISOString()
+    });
+  } catch (error) {
+    console.error('Database test error:', error);
+    res.status(500).json({
+      error: 'Database connection failed',
+      message: error instanceof Error ? error.message : 'Unknown error',
+      timestamp: new Date().toISOString()
+    });
+  }
+});
+
+// Database query endpoint
+app.get('/api/db/query', async (req, res) => {
+  try {
+    const { query } = req.query;
+    
+    if (!query || typeof query !== 'string') {
+      return res.status(400).json({
+        error: 'Query parameter is required',
+        message: 'Please provide a valid SQL query as a query parameter'
+      });
+    }
+
+    // Basic security check - only allow SELECT statements
+    if (!query.trim().toLowerCase().startsWith('select')) {
+      return res.status(400).json({
+        error: 'Only SELECT queries are allowed',
+        message: 'For security reasons, only SELECT statements are permitted'
+      });
+    }
+
+    const result = await db.query(query);
+    
+    res.json({
+      message: 'Query executed successfully',
+      data: result.rows,
+      rowCount: result.rowCount,
+      timestamp: new Date().toISOString()
+    });
+  } catch (error) {
+    console.error('Query error:', error);
+    res.status(500).json({
+      error: 'Query execution failed',
+      message: error instanceof Error ? error.message : 'Unknown error',
+      timestamp: new Date().toISOString()
+    });
+  }
+});
+
 // POST endpoint example
 app.post('/api/test', (req, res) => {
   res.json({
@@ -70,10 +131,18 @@ app.use((err: any, req: express.Request, res: express.Response, next: express.Ne
 });
 
 // Start server
-app.listen(PORT, () => {
+app.listen(PORT, async () => {
   console.log(`🚀 Server is running on port ${PORT}`);
   console.log(`📍 Health check: http://localhost:${PORT}/health`);
   console.log(`🔗 API test: http://localhost:${PORT}/api/test`);
+  console.log(`🗄️  Database test: http://localhost:${PORT}/api/db/test`);
+  
+  // Test database connection on startup
+  try {
+    await db.testConnection();
+  } catch (error) {
+    console.error('❌ Failed to connect to database on startup:', error);
+  }
 });
 
 export default app;

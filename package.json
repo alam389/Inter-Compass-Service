@@ -13,7 +13,11 @@
     "type": "git",
     "url": "git+https://github.com/alam389/Inter-Compass-Service.git"
   },
-  "keywords": ["express", "api", "backend"],
+  "keywords": [
+    "express",
+    "api",
+    "backend"
+  ],
   "author": "",
   "license": "ISC",
   "bugs": {
@@ -21,9 +25,11 @@
   },
   "homepage": "https://github.com/alam389/Inter-Compass-Service#readme",
   "dependencies": {
+    "@types/pg": "^8.15.5",
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",
-    "express": "^4.21.2"
+    "express": "^4.21.2",
+    "pg": "^8.16.3"
   },
   "devDependencies": {
     "@types/cors": "^2.8.17",
