@@ -1,0 +1,312 @@
+# Sample Onboarding Document Content
+
+Below is sample content you can convert to PDF and use for testing the InternCompass API.
+You can copy this text into a Word document or Google Doc and export it as PDF.
+
+---
+
+# Software Engineering Intern Onboarding Guide
+
+## Welcome to TechCorp!
+
+Welcome to the Software Engineering team! This guide will help you get started with your internship and provide important information about policies, procedures, and best practices.
+
+## Getting Started - First Week
+
+### Day 1: Orientation
+- **8:00 AM** - Check in at main reception (Building A, Floor 1)
+- **9:00 AM** - HR orientation and paperwork
+- **11:00 AM** - IT setup: laptop, credentials, and access badges
+- **1:00 PM** - Team introduction and mentor assignment
+- **3:00 PM** - Office tour and facility overview
+
+### Day 2-5: Onboarding Tasks
+1. Complete all HR training modules in the Learning Management System (LMS)
+2. Set up your development environment following the team's setup guide
+3. Schedule 1-on-1 meetings with your manager and mentor
+4. Join team Slack channels: #engineering, #interns-2025, #random
+5. Review codebase documentation and architecture diagrams
+
+## VPN and Remote Access
+
+### VPN Access Setup
+All employees must use VPN when accessing company resources remotely.
+
+**Steps to set up VPN:**
+1. Download Cisco AnyConnect from the IT Portal (https://it.techcorp.com/vpn)
+2. Install the application on your laptop
+3. Use your employee credentials (username@techcorp.com)
+4. Connect to server: `vpn.techcorp.com`
+5. Enable two-factor authentication (2FA) using Google Authenticator
+
+**VPN Usage Guidelines:**
+- Always connect to VPN before accessing internal resources
+- VPN is required for: Git repositories, internal wikis, databases, and file shares
+- If experiencing connection issues, contact IT Help Desk: x5555 or helpdesk@techcorp.com
+
+## Development Environment
+
+### Required Software
+- **IDE**: Visual Studio Code or IntelliJ IDEA (license provided)
+- **Version Control**: Git (install from https://git-scm.com)
+- **Node.js**: Version 18 LTS or higher
+- **Docker**: Docker Desktop for local container development
+- **Database Tools**: PostgreSQL client, Redis CLI
+
+### Code Repository Access
+1. Set up your GitHub account with company email
+2. Request repository access through the IT Portal
+3. Generate SSH keys for authentication:
+   ```bash
+   ssh-keygen -t ed25519 -C "your.email@techcorp.com"
+   ```
+4. Add your public key to GitHub settings
+5. Clone the main repository: `git clone git@github.com:techcorp/main-app.git`
+
+### Development Best Practices
+- Always create feature branches from `develop`
+- Branch naming: `feature/description`, `bugfix/issue-number`
+- Commit messages should be descriptive and follow conventional commits
+- Run tests locally before pushing: `npm test`
+- Request code reviews before merging
+
+## Team Policies
+
+### Working Hours
+- **Core hours**: 10:00 AM - 4:00 PM (must be available)
+- **Flexible hours**: Start between 8:00 AM - 10:00 AM
+- **Lunch break**: 1 hour (typically 12:00 PM - 1:00 PM)
+- **Remote work**: Up to 2 days per week (coordinate with your manager)
+
+### Communication Guidelines
+- **Urgent matters**: Slack direct message or phone call
+- **Team questions**: Post in #engineering channel
+- **Status updates**: Daily standup at 10:00 AM
+- **Response time**: Within 2 hours during working hours
+- **Out of office**: Update Slack status and calendar
+
+### Dress Code
+- **Office days**: Business casual (jeans and company t-shirts are fine)
+- **Client meetings**: Business professional
+- **Remote work**: Your choice (but be camera-ready for meetings)
+
+### Meeting Etiquette
+- Be on time (join 2-3 minutes early)
+- Camera on for team meetings
+- Mute when not speaking
+- Use "raise hand" feature to avoid interrupting
+- Take notes and follow up on action items
+
+## Do's and Don'ts
+
+### DO:
+✅ Ask questions - no question is too small
+✅ Document your learning and progress
+✅ Participate in team activities and social events
+✅ Take breaks and maintain work-life balance
+✅ Seek feedback regularly from your mentor
+✅ Share knowledge with other interns
+✅ Attend daily standups and sprint meetings
+✅ Keep your status updated on Slack
+✅ Back up your work regularly
+✅ Test your code thoroughly before submitting PRs
+
+### DON'T:
+❌ Share company credentials or access tokens
+❌ Commit sensitive data (API keys, passwords) to Git
+❌ Work on production systems without supervision
+❌ Skip code reviews or merge your own PRs
+❌ Miss deadlines without communicating early
+❌ Install unauthorized software without IT approval
+❌ Share confidential information outside the company
+❌ Bypass security protocols or VPN requirements
+❌ Work excessive hours without manager approval
+❌ Ignore compiler warnings or linter errors
+
+## Security and Confidentiality
+
+### Data Protection
+- All company data is confidential and proprietary
+- Do not share code, documents, or data with external parties
+- Use company-approved cloud storage (Google Drive for TechCorp)
+- Encrypt sensitive files using company-approved tools
+- Lock your laptop when away from desk (Windows+L or Cmd+Ctrl+Q)
+
+### Password Policy
+- Minimum 12 characters with uppercase, lowercase, numbers, and symbols
+- Change passwords every 90 days
+- Never share passwords or store them in plain text
+- Use password manager: LastPass (company license provided)
+- Enable 2FA on all accounts that support it
+
+### Phishing Awareness
+- Be suspicious of unexpected emails asking for credentials
+- Verify sender identity before clicking links
+- Report suspicious emails to security@techcorp.com
+- Never enter credentials on external websites
+- When in doubt, contact IT Security
+
+## Project Assignment
+
+### Current Project: Customer Portal Redesign
+You'll be working on the customer portal redesign project with the frontend team.
+
+**Your responsibilities:**
+- Implement UI components using React and TypeScript
+- Write unit tests using Jest and React Testing Library
+- Fix bugs assigned through Jira ticketing system
+- Participate in code reviews
+- Document your work in Confluence
+
+**Tech Stack:**
+- Frontend: React 18, TypeScript, Tailwind CSS
+- Backend: Node.js, Express, PostgreSQL
+- Testing: Jest, Vitest, Playwright
+- CI/CD: GitHub Actions
+- Deployment: AWS (CloudFront, S3, EC2)
+
+### Agile Process
+- **Sprint length**: 2 weeks
+- **Sprint planning**: Every other Monday at 10:00 AM
+- **Daily standup**: Every day at 10:00 AM (15 minutes)
+- **Sprint review**: Last Friday of sprint at 2:00 PM
+- **Retrospective**: Last Friday of sprint at 3:00 PM
+
+### Jira Workflow
+1. Ticket assigned to you
+2. Move to "In Progress" when you start
+3. Create feature branch and develop
+4. Move to "Code Review" when PR is ready
+5. Address review feedback
+6. Move to "QA Testing" after merge
+7. Move to "Done" after QA approval
+
+## Resources and Support
+
+### Key Contacts
+- **Manager**: Sarah Johnson (sarah.j@techcorp.com, x5100)
+- **Mentor**: Mike Chen (mike.chen@techcorp.com, x5234)
+- **HR**: hr@techcorp.com, x5000
+- **IT Help Desk**: helpdesk@techcorp.com, x5555
+- **Facilities**: facilities@techcorp.com, x5600
+
+### Important Links
+- **Company Wiki**: https://wiki.techcorp.com
+- **IT Portal**: https://it.techcorp.com
+- **Learning Management System**: https://learning.techcorp.com
+- **Benefits Portal**: https://benefits.techcorp.com
+- **Time Tracking**: https://timesheet.techcorp.com
+- **Expense Reports**: https://expenses.techcorp.com
+
+### Learning Resources
+- Internal coding standards: wiki.techcorp.com/standards
+- Architecture documentation: wiki.techcorp.com/architecture
+- API documentation: api.techcorp.com/docs
+- Design system: design.techcorp.com
+- Video tutorials: learning.techcorp.com/engineering
+
+### Professional Development
+- **Lunch & Learn**: Every Wednesday at 12:00 PM
+- **Tech Talks**: Monthly, first Friday at 4:00 PM
+- **Conference Budget**: $500 for intern-relevant conferences
+- **Online Courses**: LinkedIn Learning and Pluralsight access
+- **Book Club**: Engineering book club meets monthly
+
+## Intern Program Timeline
+
+### Month 1: Onboarding and Training
+- Complete all required training
+- Set up development environment
+- Shadow team members
+- Complete first small project/bug fixes
+- Mid-month check-in with manager
+
+### Month 2: Active Development
+- Take on larger features
+- Lead a small project
+- Present work at sprint review
+- Contribute to code reviews
+- Mid-internship evaluation
+
+### Month 3: Advanced Projects
+- Work on production features
+- Mentor new interns (if applicable)
+- Prepare final presentation
+- Complete internship project
+- Final evaluation and feedback
+
+### Final Week: Wrap-up
+- **Project presentation**: Present your work to the team
+- **Documentation**: Complete all project documentation
+- **Knowledge transfer**: Hand off work to team members
+- **Exit interview**: Meet with HR and manager
+- **Return equipment**: Laptop, badge, and other company property
+
+## Performance Evaluation
+
+### Evaluation Criteria
+You will be evaluated on:
+- **Technical skills**: Code quality, problem-solving, learning ability
+- **Communication**: Team collaboration, asking questions, documentation
+- **Professionalism**: Punctuality, reliability, work ethic
+- **Initiative**: Proactivity, ownership, contribution to team
+- **Growth**: Progress and improvement throughout internship
+
+### Feedback Schedule
+- **Weekly**: Informal check-ins with mentor
+- **Bi-weekly**: 1-on-1 with manager
+- **Mid-term**: Formal evaluation at 6 weeks
+- **Final**: Comprehensive evaluation in last week
+
+## Benefits and Perks
+
+### Compensation and Benefits
+- Competitive hourly rate (discussed during offer)
+- Paid holidays and company closure days
+- Health insurance (if internship > 3 months)
+- 401(k) eligibility (if internship > 6 months)
+- Public transportation subsidy
+
+### Office Perks
+- Free snacks and beverages
+- Catered lunch on Fridays
+- Gym access (Building C, basement)
+- Game room and relaxation area
+- Standing desks and ergonomic equipment
+- Free parking or transit pass
+
+### Social Activities
+- Team lunches and happy hours
+- Intern events and networking
+- Company-wide events (summer picnic, holiday party)
+- Sports leagues and hobby clubs
+- Volunteer opportunities
+
+## Acknowledgements
+
+I acknowledge that I have read and understood the contents of this onboarding guide. I agree to follow all company policies, security protocols, and professional standards outlined in this document.
+
+**Employee Signature**: _________________________
+
+**Date**: _________________________
+
+**Manager Signature**: _________________________
+
+**Date**: _________________________
+
+---
+
+## Questions or Concerns?
+
+If you have any questions about the information in this guide, please contact:
+- Your manager or mentor
+- HR department: hr@techcorp.com
+- IT Help Desk: helpdesk@techcorp.com
+
+Welcome to the team, and we wish you a successful and enriching internship experience!
+
+---
+
+**Document Version**: 2.1  
+**Last Updated**: October 2025  
+**Next Review**: January 2026

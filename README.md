@@ -162,6 +162,223 @@ LOG_LEVEL=info
 - `GET /chat/sessions` - Get user's chat sessions
 - `GET /chat/sessions/:sessionId` - Get chat history
 
+## Testing the API
+
+### Using the Swagger UI (Recommended for Beginners)
+
+1. **Start the backend server:**
+   ```bash
+   npm run dev
+   ```
+
+2. **Open your browser and navigate to:**
+   ```
+   http://localhost:3001/api-docs
+   ```
+
+3. **You'll see the interactive API documentation where you can:**
+   - Browse all available endpoints
+   - View request/response schemas
+   - Try out API calls directly from the browser
+   - See example responses
+
+### Using cURL
+
+#### Health Check
+```bash
+curl http://localhost:3001/health
+```
+
+#### Upload a Document (Admin)
+```bash
+curl -X POST http://localhost:3001/admin/documents/upload \
+  -H "Authorization: Bearer YOUR_TOKEN" \
+  -F "file=@path/to/document.pdf" \
+  -F "role_tags=[\"software-intern\",\"data-analyst\"]" \
+  -F "team_ids=[1,2]" \
+  -F "sensitivity_tags=[\"internal\"]"
+```
+
+#### Ingest a Document
+```bash
+curl -X POST http://localhost:3001/admin/documents/DOCUMENT_ID/ingest \
+  -H "Authorization: Bearer YOUR_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"reingest": false}'
+```
+
+#### Generate an Outline
+```bash
+curl -X POST http://localhost:3001/outline \
+  -H "Authorization: Bearer YOUR_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "role": "software-intern",
+    "teamId": 1,
+    "level": "intern",
+    "locale": "en-US",
+    "sections": ["dos", "donts", "policies", "timeline", "acknowledgements"]
+  }'
+```
+
+#### Chat with the System
+```bash
+curl -X POST http://localhost:3001/chat \
+  -H "Authorization: Bearer YOUR_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "message": "How do I get VPN access?",
+    "maxTokens": 600
+  }'
+```
+
+#### Get Chat History
+```bash
+curl http://localhost:3001/chat/sessions/SESSION_ID \
+  -H "Authorization: Bearer YOUR_TOKEN"
+```
+
+### Using Postman
+
+1. **Import the API:**
+   - Open Postman
+   - Create a new collection named "InternCompass API"
+   - Add base URL as a collection variable: `http://localhost:3001`
+
+2. **Set up authentication:**
+   - Go to the collection's Authorization tab
+   - Type: Bearer Token
+   - Token: `YOUR_TOKEN`
+
+3. **Create requests for each endpoint listed above**
+
+4. **Alternative:** Import from Swagger
+   - Visit `http://localhost:3001/api-docs`
+   - Look for the "Download" or "Export" option
+   - Import the OpenAPI spec into Postman
+
+### Using the Example Script
+
+We provide a ready-to-use example script in the `examples/` folder:
+
+1. **Make sure the backend is running:**
+   ```bash
+   npm run dev
+   ```
+
+2. **In another terminal, run the example script:**
+   ```bash
+   node examples/api-usage.js
+   ```
+
+3. **The script demonstrates:**
+   - Health check
+   - Document upload (requires multipart form data setup)
+   - Document ingestion
+   - Outline generation
+   - Chat interaction
+   - Chat history retrieval
+
+4. **Customize the script:**
+   - Update `AUTH_TOKEN` with a valid token
+   - Modify the example data to match your use case
+   - Add or remove API calls as needed
+
+### Using Thunder Client (VS Code Extension)
+
+1. **Install Thunder Client extension in VS Code**
+
+2. **Create a new request:**
+   - Click the Thunder Client icon in the sidebar
+   - Click "New Request"
+   - Set the method (GET, POST, etc.)
+   - Enter the URL: `http://localhost:3001/endpoint`
+
+3. **Add headers:**
+   - Click the "Headers" tab
+   - Add: `Authorization: Bearer YOUR_TOKEN`
+   - Add: `Content-Type: application/json`
+
+4. **Add request body (for POST requests):**
+   - Click the "Body" tab
+   - Select "JSON"
+   - Enter your JSON payload
+
+### Using HTTPie
+
+HTTPie is a user-friendly command-line HTTP client:
+
+#### Install HTTPie
+```bash
+# Windows (using pip)
+pip install httpie
+
+# Or using Scoop
+scoop install httpie
+```
+
+#### Example Requests
+```bash
+# Health check
+http GET http://localhost:3001/health
+
+# Chat
+http POST http://localhost:3001/chat \
+  Authorization:"Bearer YOUR_TOKEN" \
+  message="How do I get VPN access?" \
+  maxTokens:=600
+
+# Generate outline
+http POST http://localhost:3001/outline \
+  Authorization:"Bearer YOUR_TOKEN" \
+  role="software-intern" \
+  teamId:=1 \
+  level="intern" \
+  locale="en-US" \
+  sections:='["dos","donts","policies","timeline","acknowledgements"]'
+```
+
+### Common Testing Tips
+
+1. **Start with the health endpoint** to verify the service is running:
+   ```bash
+   curl http://localhost:3001/health
+   ```
+
+2. **Check the logs** for detailed error messages:
+   - The backend logs will show request details and any errors
+   - Look for structured JSON logs with request IDs
+
+3. **Authentication:** Most endpoints require authentication. Replace `YOUR_TOKEN` with:
+   - A valid JWT token from your auth system
+   - For development, check if mock tokens are enabled
+
+4. **Rate limiting:** Be aware that endpoints have rate limits:
+   - 100 requests per 15 minutes for most endpoints
+   - 10 requests per 15 minutes for resource-intensive operations
+
+5. **Test data:** Use the sample PDF in `test/data/` folder:
+   ```
+   test/data/05-versions-space.pdf
+   ```
+
+6. **Workflow testing:** Follow this sequence for complete testing:
+   - ✅ Health check
+   - ✅ Upload document (admin)
+   - ✅ Review and approve document
+   - ✅ Ingest document
+   - ✅ Generate outline
+   - ✅ Chat with the system
+   - ✅ Get chat history
+
+### Troubleshooting API Tests
+
+- **Connection refused:** Make sure the backend is running on port 3001
+- **401 Unauthorized:** Check your authentication token
+- **500 Internal Server Error:** Check backend logs and ensure all services (PostgreSQL, Redis, S3) are running
+- **Rate limit exceeded:** Wait 15 minutes or restart the server to reset rate limits
+- **Document ingestion stuck:** Make sure the worker process is running (`npm run worker`)
+
 ## How RAG Works Here
 
 ### 1. Document Upload & Review
