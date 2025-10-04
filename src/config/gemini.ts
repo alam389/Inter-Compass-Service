@@ -31,7 +31,7 @@ class GeminiConfig {
    * @param modelName - The model to use (default: gemini-1.5-flash)
    * @returns The model instance or null if not initialized
    */
-  getModel(modelName: string = 'gemini-1.5-flash') {
+  getModel(modelName: string = 'gemini-2.5-pro') {
     if (!this.genAI) {
       throw new Error('Gemini AI not initialized. Please check your GEMINI_API_KEY environment variable.');
     }
@@ -69,7 +69,7 @@ class GeminiConfig {
       }
 
       const model = this.getModel();
-      const result = await model.generateContent('Hello, this is a test message.');
+      const result = await model.generateContent('what is today\'s date?');
       const response = await result.response;
       const text = response.text();
       
