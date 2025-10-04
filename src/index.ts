@@ -2,6 +2,11 @@ import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import { db } from './database';
+import { geminiConfig } from './config/gemini';
+import geminiRoutes from './routes/gemini';
+import usersRoutes from './routes/users';
+import chatRoutes from './routes/chat';
+import { requestLogger } from './middleware/validation';
 
 // Load environment variables
 dotenv.config();
@@ -13,6 +18,7 @@ const PORT = process.env.PORT || 3000;
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(requestLogger);
 
 // Basic route
 app.get('/', (req, res) => {
@@ -33,6 +39,11 @@ app.get('/health', (req, res) => {
 });
 
 // API routes will be added here as needed
+
+// API Routes
+app.use('/api/gemini', geminiRoutes);
+app.use('/api/users', usersRoutes);
+app.use('/api/chat', chatRoutes);
 
 // 404 handler
 app.use((req, res) => {
@@ -55,12 +66,21 @@ app.use((err: any, req: express.Request, res: express.Response, next: express.Ne
 app.listen(PORT, async () => {
   console.log(`🚀 Server is running on port ${PORT}`);
   console.log(`📍 Health check: http://localhost:${PORT}/health`);
+  console.log(`🤖 Gemini API: http://localhost:${PORT}/api/gemini/status`);
   
   // Test database connection on startup
   try {
     await db.testConnection();
   } catch (error) {
     console.error('❌ Failed to connect to database on startup:', error);
+  }
+
+  // Test Gemini connection on startup
+  if (geminiConfig.isConfigured()) {
+    console.log('🔄 Testing Gemini connection...');
+    await geminiConfig.testConnection();
+  } else {
+    console.log('⚠️  Gemini not configured. Set GEMINI_API_KEY to enable AI features.');
   }
 });
 
