@@ -1,87 +1,67 @@
 import express from 'express';
 import cors from 'cors';
-import helmet from 'helmet';
-import { config as dotenvConfig } from 'dotenv';
-import { logger } from './lib/logger.js';
-import { errorHandler } from './middleware/errorHandler.js';
-import { rateLimiter } from './middleware/rateLimiter.js';
-import { authMiddleware } from './middleware/auth.js';
-import { setupSwagger } from './lib/swagger.js';
-import { initializeDatabase } from './db/connection.js';
-import { initializeRedis } from './lib/redis.js';
-import { initializeWorkers } from './workers/index.js';
+import dotenv from 'dotenv';
+import { db } from './database';
 
-// Import route handlers
-import adminRoutes from './routes/admin.js';
-import outlineRoutes from './routes/outline.js';
-import chatRoutes from './routes/chat.js';
-import healthRoutes from './routes/health.js';
-
-// Load environment variables FIRST
-dotenvConfig();
+// Load environment variables
+dotenv.config();
 
 const app = express();
-const PORT = process.env.PORT || 3001;
+const PORT = process.env.PORT || 3000;
 
-// Security middleware
-app.use(helmet());
-app.use(cors({
-  origin: process.env.FRONTEND_URL || 'http://localhost:5173',
-  credentials: true
-}));
+// Middleware
+app.use(cors());
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
-// Body parsing middleware
-app.use(express.json({ limit: '50mb' }));
-app.use(express.urlencoded({ extended: true, limit: '50mb' }));
+// Basic route
+app.get('/', (req, res) => {
+  res.json({
+    message: 'Welcome to Inter-Compass Service API',
+    version: '1.0.0',
+    status: 'running'
+  });
+});
 
-// Rate limiting
-app.use(rateLimiter);
+// Health check endpoint
+app.get('/health', (req, res) => {
+  res.json({
+    status: 'healthy',
+    timestamp: new Date().toISOString(),
+    uptime: process.uptime()
+  });
+});
 
-// Health check (no auth required)
-app.use('/health', healthRoutes);
-
-// API routes with authentication
-app.use('/admin', authMiddleware, adminRoutes);
-app.use('/outline', authMiddleware, outlineRoutes);
-app.use('/chat', authMiddleware, chatRoutes);
-
-// Swagger documentation
-setupSwagger(app);
-
-// Error handling
-app.use(errorHandler);
+// API routes will be added here as needed
 
 // 404 handler
-app.use('*', (req, res) => {
-  res.status(404).json({ error: 'Route not found' });
+app.use((req, res) => {
+  res.status(404).json({
+    error: 'Route not found',
+    message: `Cannot ${req.method} ${req.originalUrl}`
+  });
 });
 
-async function startServer() {
+// Error handler
+app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
+  console.error(err.stack);
+  res.status(500).json({
+    error: 'Something went wrong!',
+    message: process.env.NODE_ENV === 'development' ? err.message : 'Internal server error'
+  });
+});
+
+// Start server
+app.listen(PORT, async () => {
+  console.log(`🚀 Server is running on port ${PORT}`);
+  console.log(`📍 Health check: http://localhost:${PORT}/health`);
+  
+  // Test database connection on startup
   try {
-    // Initialize services
-    await initializeDatabase();
-    await initializeRedis();
-    await initializeWorkers();
-    
-    app.listen(PORT, () => {
-      logger.info(`🚀 InternCompass Service running on port ${PORT}`);
-      logger.info(`📚 API Documentation: http://localhost:${PORT}/api-docs`);
-    });
+    await db.testConnection();
   } catch (error) {
-    logger.error({ error }, 'Failed to start server');
-    process.exit(1);
+    console.error('❌ Failed to connect to database on startup:', error);
   }
-}
-
-// Graceful shutdown
-process.on('SIGTERM', () => {
-  logger.info('SIGTERM received, shutting down gracefully');
-  process.exit(0);
 });
 
-process.on('SIGINT', () => {
-  logger.info('SIGINT received, shutting down gracefully');
-  process.exit(0);
-});
-
-startServer();
+export default app;
