@@ -7,6 +7,13 @@ import { geminiConfig } from '../config/gemini';
  * Handles API endpoints for Gemini AI operations
  */
 
+/**
+ * Helper function to get the actual model name being used
+ */
+function getActualModelName(model: string): string {
+  return model === 'pro' ? 'gemini-1.5-pro' : geminiConfig.getDefaultModel();
+}
+
 export class GeminiController {
   /**
    * Get Gemini service status and configuration
@@ -17,6 +24,7 @@ export class GeminiController {
         configured: geminiConfig.isConfigured(),
         ready: geminiService.isReady(),
         availableModels: geminiConfig.getAvailableModels(),
+        defaultModel: geminiConfig.getDefaultModel(),
         timestamp: new Date().toISOString()
       };
 
@@ -90,7 +98,7 @@ export class GeminiController {
         data: {
           prompt,
           response: result,
-          model: model === 'pro' ? 'gemini-1.5-pro' : 'gemini-1.5-flash',
+          model: getActualModelName(model),
           timestamp: new Date().toISOString()
         }
       });
@@ -130,7 +138,7 @@ export class GeminiController {
         success: true,
         data: {
           chatSessionId,
-          model: model === 'pro' ? 'gemini-1.5-pro' : 'gemini-1.5-flash',
+          model: getActualModelName(model),
           message: 'Chat session started. Use /chat/send-message endpoint to continue the conversation.',
           timestamp: new Date().toISOString()
         }
@@ -178,7 +186,7 @@ export class GeminiController {
         data: {
           message,
           response,
-          model: model === 'pro' ? 'gemini-1.5-pro' : 'gemini-1.5-flash',
+          model: getActualModelName(model),
           timestamp: new Date().toISOString()
         }
       });
@@ -225,7 +233,7 @@ export class GeminiController {
           instruction,
           analysis: result,
           contentLength: content.length,
-          model: model === 'pro' ? 'gemini-1.5-pro' : 'gemini-1.5-flash',
+          model: getActualModelName(model),
           timestamp: new Date().toISOString()
         }
       });

@@ -21,7 +21,7 @@ export interface GenerationConfig {
 class GeminiService {
   private model: GenerativeModel | null = null;
 
-  constructor(modelName: string = 'gemini-1.5-flash') {
+  constructor(modelName?: string) {
     try {
       if (geminiConfig.isConfigured()) {
         this.model = geminiConfig.getModel(modelName);
@@ -143,14 +143,15 @@ class GeminiService {
     return {
       isConfigured: geminiConfig.isConfigured(),
       availableModels: geminiConfig.getAvailableModels(),
+      defaultModel: geminiConfig.getDefaultModel(),
       isReady: this.isReady()
     };
   }
 }
 
-// Export singleton instances for different models
-export const geminiService = new GeminiService('gemini-1.5-flash');
-export const geminiProService = new GeminiService('gemini-1.5-pro');
+// Export singleton instances - using default model from env and specific models
+export const geminiService = new GeminiService(); // Uses GEN_MODEL from env
+export const geminiProService = new GeminiService('gemini-1.5-pro'); // Explicit pro model
 
 // Export the class for custom instances
 export { GeminiService };

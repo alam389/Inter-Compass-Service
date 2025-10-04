@@ -8,9 +8,11 @@ import { GoogleGenerativeAI } from '@google/generative-ai';
 class GeminiConfig {
   private genAI: GoogleGenerativeAI | null = null;
   private apiKey: string;
+  private defaultModel: string;
 
   constructor() {
     this.apiKey = process.env.GEMINI_API_KEY || '';
+    this.defaultModel = process.env.GEN_MODEL || 'gemini-1.5-flash';
     
     if (!this.apiKey) {
       console.warn('⚠️  GEMINI_API_KEY not found in environment variables');
@@ -28,15 +30,16 @@ class GeminiConfig {
 
   /**
    * Get a Gemini model instance
-   * @param modelName - The model to use (default: gemini-1.5-flash)
+   * @param modelName - The model to use (default: from GEN_MODEL env var)
    * @returns The model instance or null if not initialized
    */
-  getModel(modelName: string = 'gemini-2.5-pro') {
+  getModel(modelName?: string) {
     if (!this.genAI) {
       throw new Error('Gemini AI not initialized. Please check your GEMINI_API_KEY environment variable.');
     }
 
-    return this.genAI.getGenerativeModel({ model: modelName });
+    const model = modelName || this.defaultModel;
+    return this.genAI.getGenerativeModel({ model });
   }
 
   /**
@@ -45,6 +48,14 @@ class GeminiConfig {
    */
   isConfigured(): boolean {
     return this.genAI !== null && this.apiKey !== '';
+  }
+
+  /**
+   * Get the default model name from environment variables
+   * @returns The default model name
+   */
+  getDefaultModel(): string {
+    return this.defaultModel;
   }
 
   /**
