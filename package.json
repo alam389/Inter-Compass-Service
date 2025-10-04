@@ -1,0 +1,36 @@
+{
+  "name": "inter-compass-service",
+  "version": "1.0.0",
+  "description": "Inter-Compass Backend Service",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "dev": "nodemon src/index.ts",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/alam389/Inter-Compass-Service.git"
+  },
+  "keywords": ["express", "api", "backend"],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/alam389/Inter-Compass-Service/issues"
+  },
+  "homepage": "https://github.com/alam389/Inter-Compass-Service#readme",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.21.2"
+  },
+  "devDependencies": {
+    "@types/cors": "^2.8.17",
+    "@types/express": "^5.0.0",
+    "@types/node": "^22.10.2",
+    "nodemon": "^3.1.9",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.7.2"
+  }
+}
