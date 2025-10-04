@@ -6,21 +6,12 @@ dotenv.config();
 
 // Fallback to hardcoded values if env vars are not loaded
 if (!process.env.PGHOST) {
-  console.log('⚠️ Environment variables not loaded from .env, using hardcoded values');
   process.env.PGHOST = 'ep-icy-cake-adlg1pak-pooler.c-2.us-east-1.aws.neon.tech';
   process.env.PGDATABASE = 'neondb';
   process.env.PGUSER = 'neondb_owner';
   process.env.PGPASSWORD = 'npg_V0ks7LPqizvX';
   process.env.PGSSLMODE = 'require';
 }
-
-// Debug environment variables
-console.log('🔍 Environment variables loaded:');
-console.log('PGHOST:', process.env.PGHOST);
-console.log('PGDATABASE:', process.env.PGDATABASE);
-console.log('PGUSER:', process.env.PGUSER);
-console.log('PGPASSWORD:', process.env.PGPASSWORD ? '***' : 'undefined');
-console.log('PGSSLMODE:', process.env.PGSSLMODE);
 
 // Database configuration - using connection string for better compatibility
 const connectionString = `postgresql://${process.env.PGUSER}:${process.env.PGPASSWORD}@${process.env.PGHOST}/${process.env.PGDATABASE}?sslmode=require`;
@@ -84,22 +75,11 @@ export class Database {
   // Test database connection
   public async testConnection(): Promise<boolean> {
     try {
-      console.log('🔍 Testing database connection...');
-      console.log('Host:', process.env.PGHOST);
-      console.log('Database:', process.env.PGDATABASE);
-      console.log('User:', process.env.PGUSER);
-      console.log('SSL Mode:', process.env.PGSSLMODE);
-      
       const result = await this.query('SELECT NOW() as current_time');
       console.log('✅ Database connected successfully at:', result.rows[0].current_time);
       return true;
     } catch (error) {
       console.error('❌ Database connection failed:', error);
-      console.error('Error details:', {
-        message: error instanceof Error ? error.message : 'Unknown error',
-        code: (error as any)?.code,
-        detail: (error as any)?.detail
-      });
       return false;
     }
   }
