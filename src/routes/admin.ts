@@ -28,7 +28,7 @@ router.get('/tags', async (req, res) => {
 router.get('/documents', async (req, res) => {
   try {
     const result = await db.query(
-      `SELECT d.documentid, d.documenttitle, d.documentcontent, t.tagname
+      `SELECT d.documentid, d.documenttitle, d.documentcontent, d.uploadedat, t.tagtype
        FROM documents d
        LEFT JOIN tags t ON d.tagid = t.tagid`
     );
@@ -36,17 +36,17 @@ router.get('/documents', async (req, res) => {
     const documents = result.rows.map((row: any) => {
       // Extract tag fields (assuming tagid, tagname, etc. are columns in tags)
       const {
-        documentid, documenttitle, documentcontent, tagid,
-        tagname, ...rest
+        documentid, documenttitle, documentcontent, uploadedat, tagid,
+        tagtype, ...rest
       } = row;
       // All tag columns start after document columns
-      const tag = tagid ? { tagid, tagname, ...rest } : null;
+      const tag = tagid ? { tagid, tagtype, ...rest } : null;
       return {
         documentid,
         documenttitle,
         documentcontent,
-        tagid,
-        tag,
+        uploadedat,
+        tagtype,
       };
     });
     res.json({
