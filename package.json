@@ -25,6 +25,7 @@
   },
   "homepage": "https://github.com/alam389/Inter-Compass-Service#readme",
   "dependencies": {
+    "@google/generative-ai": "^0.24.1",
     "@types/pg": "^8.15.5",
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",
