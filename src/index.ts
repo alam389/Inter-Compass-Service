@@ -5,7 +5,7 @@ import { db } from './database';
 import { geminiConfig } from './config/gemini';
 import geminiRoutes from './routes/gemini';
 import { requestLogger } from './middleware/validation';
-
+import adminRoutes from './routes/admin';
 // Load environment variables
 dotenv.config();
 
@@ -38,6 +38,7 @@ app.get('/health', (req, res) => {
 
 // API routes will be added here as needed
 
+app.use('/api/admin', adminRoutes);
 // API Routes
 app.use('/api/gemini', geminiRoutes);
 

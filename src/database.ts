@@ -6,8 +6,8 @@ dotenv.config();
 
 // Fallback to hardcoded values if env vars are not loaded
 if (!process.env.PGHOST) {
-  process.env.PGHOST = 'ep-icy-cake-adlg1pak-pooler.c-2.us-east-1.aws.neon.tech';
-  process.env.PGDATABASE = 'neondb';
+  process.env.PGHOST='ep-ancient-sky-ado6vkwx-pooler.c-2.us-east-1.aws.neon.tech';
+  process.env.PGDATABASE='neondb';
   process.env.PGUSER = 'neondb_owner';
   process.env.PGPASSWORD = 'npg_V0ks7LPqizvX';
   process.env.PGSSLMODE = 'require';
