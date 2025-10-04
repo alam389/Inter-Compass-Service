@@ -1,4 +1,8 @@
 import { z } from 'zod';
+import { config as dotenvConfig } from 'dotenv';
+
+// Load environment variables first
+dotenvConfig();
 
 const configSchema = z.object({
   // Server
@@ -18,9 +22,9 @@ const configSchema = z.object({
   GEN_MODEL: z.string().default('gemini-1.5-pro'),
   
   // RAG Configuration
-  RAG_TOP_K: z.string().transform(Number).default(8),
-  CHUNK_TOKENS: z.string().transform(Number).default(900),
-  CHUNK_OVERLAP_TOKENS: z.string().transform(Number).default(180),
+  RAG_TOP_K: z.string().transform(Number).default('8'),
+  CHUNK_TOKENS: z.string().transform(Number).default('900'),
+  CHUNK_OVERLAP_TOKENS: z.string().transform(Number).default('180'),
   
   // AWS S3
   S3_BUCKET: z.string().min(1, 'S3_BUCKET is required'),

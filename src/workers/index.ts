@@ -8,25 +8,28 @@ export const QUEUE_NAMES = {
   DOCUMENT_INGESTION: 'document-ingestion',
 } as const;
 
-// Create queues
-export const documentIngestionQueue = new Queue(QUEUE_NAMES.DOCUMENT_INGESTION, {
-  connection: getRedis(),
-  defaultJobOptions: {
-    removeOnComplete: 10,
-    removeOnFail: 5,
-    attempts: 3,
-    backoff: {
-      type: 'exponential',
-      delay: 2000,
-    },
-  },
-});
+// Queue instance (initialized later)
+export let documentIngestionQueue: Queue;
 
 // Create workers
 let documentIngestionWorker: Worker | null = null;
 
 export async function initializeWorkers(): Promise<void> {
   try {
+    // Create the queue (now that Redis is initialized)
+    documentIngestionQueue = new Queue(QUEUE_NAMES.DOCUMENT_INGESTION, {
+      connection: getRedis(),
+      defaultJobOptions: {
+        removeOnComplete: 10,
+        removeOnFail: 5,
+        attempts: 3,
+        backoff: {
+          type: 'exponential',
+          delay: 2000,
+        },
+      },
+    });
+
     // Document ingestion worker
     documentIngestionWorker = new Worker(
       QUEUE_NAMES.DOCUMENT_INGESTION,
@@ -42,16 +45,16 @@ export async function initializeWorkers(): Promise<void> {
     });
 
     documentIngestionWorker.on('failed', (job, err) => {
-      logger.error(`Document ingestion failed: ${job?.id}`, err);
+      logger.error({ job: job?.id, error: err }, 'Document ingestion failed');
     });
 
     documentIngestionWorker.on('error', (err) => {
-      logger.error('Document ingestion worker error:', err);
+      logger.error({ error: err }, 'Document ingestion worker error');
     });
 
     logger.info('✅ Workers initialized successfully');
   } catch (error) {
-    logger.error('❌ Failed to initialize workers:', error);
+    logger.error({ error }, '❌ Failed to initialize workers');
     throw error;
   }
 }
@@ -81,7 +84,7 @@ export async function addDocumentIngestionJob(documentId: string, priority: numb
     logger.info(`Document ingestion job queued: ${documentId} (job: ${job.id})`);
     return job;
   } catch (error) {
-    logger.error('Failed to queue document ingestion:', error);
+    logger.error({ error }, 'Failed to queue document ingestion');
     throw error;
   }
 }

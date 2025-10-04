@@ -1,7 +1,7 @@
 import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
-import { config } from 'dotenv';
+import { config as dotenvConfig } from 'dotenv';
 import { logger } from './lib/logger.js';
 import { errorHandler } from './middleware/errorHandler.js';
 import { rateLimiter } from './middleware/rateLimiter.js';
@@ -17,8 +17,8 @@ import outlineRoutes from './routes/outline.js';
 import chatRoutes from './routes/chat.js';
 import healthRoutes from './routes/health.js';
 
-// Load environment variables
-config();
+// Load environment variables FIRST
+dotenvConfig();
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -68,7 +68,7 @@ async function startServer() {
       logger.info(`📚 API Documentation: http://localhost:${PORT}/api-docs`);
     });
   } catch (error) {
-    logger.error('Failed to start server:', error);
+    logger.error({ error }, 'Failed to start server');
     process.exit(1);
   }
 }
