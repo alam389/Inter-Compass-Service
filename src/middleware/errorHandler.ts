@@ -22,14 +22,14 @@ export function errorHandler(
   let { statusCode = 500, message } = error;
 
   // Log error
-  logger.error('Error occurred:', {
+  logger.error({
     error: message,
     stack: error.stack,
     url: req.url,
     method: req.method,
     ip: req.ip,
     userAgent: req.get('User-Agent'),
-  });
+  }, 'Error occurred');
 
   // Handle specific error types
   if (error.name === 'ValidationError') {

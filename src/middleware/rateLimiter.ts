@@ -43,11 +43,11 @@ export function createRateLimiter(config: Partial<RateLimitConfig> = {}) {
         'X-RateLimit-Reset': new Date(Date.now() + finalConfig.windowMs).toISOString(),
       });
       
-      next();
+      return next();
     } catch (error) {
-      logger.error('Rate limiter error:', error);
+      logger.error({ error }, 'Rate limiter error');
       // If Redis is down, allow the request
-      next();
+      return next();
     }
   };
 }

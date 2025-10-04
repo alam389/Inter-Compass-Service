@@ -31,6 +31,8 @@ export class IndexingService {
       for (let i = 0; i < chunks.length; i++) {
         const chunk = chunks[i];
         const embedding = embeddings[i];
+        
+        if (!chunk) continue;
 
         await pool.query(`
           INSERT INTO document_chunks (
@@ -54,7 +56,7 @@ export class IndexingService {
       logger.info(`Indexed ${chunks.length} chunks for document ${documentId}`);
     } catch (error) {
       await pool.query('ROLLBACK');
-      logger.error('Failed to index chunks:', error);
+      logger.error({ error }, 'Failed to index chunks');
       throw error;
     }
   }
@@ -69,7 +71,7 @@ export class IndexingService {
       await pool.query('DELETE FROM document_chunks WHERE document_id = $1', [documentId]);
       logger.info(`Removed chunks for document ${documentId}`);
     } catch (error) {
-      logger.error('Failed to remove document chunks:', error);
+      logger.error({ error }, 'Failed to remove document chunks');
       throw error;
     }
   }
@@ -144,7 +146,7 @@ export class RetrievalService {
       logger.info(`Retrieved ${chunks.length} similar chunks for query: ${query.substring(0, 100)}...`);
       return chunks;
     } catch (error) {
-      logger.error('Failed to retrieve similar chunks:', error);
+      logger.error({ error }, 'Failed to retrieve similar chunks');
       throw error;
     }
   }
@@ -179,7 +181,7 @@ export class RetrievalService {
         created_at: row.created_at
       }));
     } catch (error) {
-      logger.error('Failed to get document chunks:', error);
+      logger.error({ error }, 'Failed to get document chunks');
       throw error;
     }
   }

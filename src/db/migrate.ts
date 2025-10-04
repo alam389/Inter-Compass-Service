@@ -29,7 +29,7 @@ async function runMigrations() {
 
     logger.info('🎉 All migrations completed successfully');
   } catch (error) {
-    logger.error('❌ Migration failed:', error);
+    logger.error({ error }, '❌ Migration failed');
     throw error;
   }
 }

@@ -35,7 +35,7 @@ export class EmbeddingService {
             const result = await model.embedContent(text);
             return result.embedding.values;
           } catch (error) {
-            logger.error(`Failed to embed text: ${text.substring(0, 100)}...`, error);
+            logger.error({ error, textPreview: text.substring(0, 100) }, 'Failed to embed text');
             // Return zero vector as fallback
             return new Array(1536).fill(0);
           }
@@ -53,7 +53,7 @@ export class EmbeddingService {
       logger.info(`Generated ${embeddings.length} embeddings`);
       return embeddings;
     } catch (error) {
-      logger.error('Embedding generation failed:', error);
+      logger.error({ error }, 'Embedding generation failed');
       throw new Error(`Failed to generate embeddings: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
   }

@@ -86,18 +86,18 @@ export async function uploadDocument(req: Request, res: Response) {
     
     logger.info(`Document uploaded: ${document.id} - ${req.file.originalname}`);
     
-    res.json({
+    return res.json({
       documentId: document.id,
       status: document.status,
     });
   } catch (error) {
-    logger.error('Document upload failed:', error);
+    logger.error({ error }, 'Document upload failed');
     
     if (error instanceof z.ZodError) {
       return res.status(400).json({ error: 'Invalid request data', details: error.errors });
     }
     
-    res.status(500).json({ error: 'Upload failed' });
+    return res.status(500).json({ error: 'Upload failed' });
   }
 }
 
@@ -153,18 +153,18 @@ export async function ingestDocument(req: Request, res: Response) {
     
     logger.info(`Document ingested: ${document.id} - ${chunks.length} chunks`);
     
-    res.json({
+    return res.json({
       ok: true,
       chunks: chunks.length,
     });
   } catch (error) {
-    logger.error('Document ingestion failed:', error);
+    logger.error({ error }, 'Document ingestion failed');
     
     if (error instanceof z.ZodError) {
       return res.status(400).json({ error: 'Invalid request data', details: error.errors });
     }
     
-    res.status(500).json({ error: 'Ingestion failed' });
+    return res.status(500).json({ error: 'Ingestion failed' });
   }
 }
 
@@ -181,10 +181,10 @@ export async function getDocument(req: Request, res: Response) {
       return res.status(404).json({ error: 'Document not found' });
     }
     
-    res.json(result.rows[0]);
+    return res.json(result.rows[0]);
   } catch (error) {
-    logger.error('Failed to get document:', error);
-    res.status(500).json({ error: 'Failed to get document' });
+    logger.error({ error }, 'Failed to get document');
+    return res.status(500).json({ error: 'Failed to get document' });
   }
 }
 
@@ -209,7 +209,7 @@ export async function listDocuments(req: Request, res: Response) {
     const countResult = await pool.query('SELECT COUNT(*) FROM documents');
     const total = parseInt(countResult.rows[0].count);
     
-    res.json({
+    return res.json({
       documents: result.rows,
       pagination: {
         page,
@@ -219,7 +219,7 @@ export async function listDocuments(req: Request, res: Response) {
       },
     });
   } catch (error) {
-    logger.error('Failed to list documents:', error);
-    res.status(500).json({ error: 'Failed to list documents' });
+    logger.error({ error }, 'Failed to list documents');
+    return res.status(500).json({ error: 'Failed to list documents' });
   }
 }

@@ -38,6 +38,8 @@ export class ChunkingService {
 
     for (let i = 0; i < sentences.length; i++) {
       const sentence = sentences[i];
+      if (!sentence) continue;
+      
       const sentenceTokens = this.estimateTokens(sentence);
 
       // If adding this sentence would exceed the token limit, finalize current chunk
@@ -62,7 +64,7 @@ export class ChunkingService {
         if (currentChunk) {
           currentChunk += ' ' + sentence;
         } else {
-          currentChunk = sentence;
+          currentChunk = sentence || '';
           pageFrom = pageNumber;
         }
         currentTokens += sentenceTokens;

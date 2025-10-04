@@ -94,7 +94,7 @@ export async function processDocumentIngestion(job: Job<DocumentIngestionJobData
     };
     
   } catch (error) {
-    logger.error(`Document ingestion failed for ${documentId}:`, error);
+    logger.error({ error, documentId }, 'Document ingestion failed');
     
     // Update document status to indicate ingestion failure
     try {
@@ -104,7 +104,7 @@ export async function processDocumentIngestion(job: Job<DocumentIngestionJobData
         ['rejected', documentId]
       );
     } catch (dbError) {
-      logger.error('Failed to update document status after ingestion failure:', dbError);
+      logger.error({ error: dbError }, 'Failed to update document status after ingestion failure');
     }
     
     throw error;

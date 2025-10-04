@@ -50,7 +50,7 @@ export interface RetrievalFilter {
 export interface Citation {
   documentId: string;
   title: string;
-  pages?: string;
+  pages?: string | undefined;
 }
 
 export interface OutlineResponse {

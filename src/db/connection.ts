@@ -28,7 +28,7 @@ export async function initializeDatabase(): Promise<void> {
 
     logger.info('✅ Database connected successfully');
   } catch (error) {
-    logger.error('❌ Database connection failed:', error);
+    logger.error({ error }, '❌ Database connection failed');
     throw error;
   }
 }

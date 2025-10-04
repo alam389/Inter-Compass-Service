@@ -40,13 +40,13 @@ export function authMiddleware(req: Request, res: Response, next: NextFunction) 
         teamId: 1,
         permissions: ['read', 'write'],
       };
-      next();
+      return next();
     } else {
       return res.status(401).json({ error: 'Invalid token' });
     }
   } catch (error) {
-    logger.error('Authentication error:', error);
-    res.status(401).json({ error: 'Authentication failed' });
+    logger.error({ error }, 'Authentication error');
+    return res.status(401).json({ error: 'Authentication failed' });
   }
 }
 
@@ -63,5 +63,5 @@ export function adminMiddleware(req: Request, res: Response, next: NextFunction)
     return res.status(403).json({ error: 'Admin access required' });
   }
 
-  next();
+  return next();
 }

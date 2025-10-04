@@ -47,7 +47,7 @@ export class S3Service {
       logger.info(`File uploaded to S3: ${key}`);
       return key;
     } catch (error) {
-      logger.error('Failed to upload file to S3:', error);
+      logger.error({ error }, 'Failed to upload file to S3');
       throw new Error(`S3 upload failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
   }
@@ -76,7 +76,7 @@ export class S3Service {
       logger.info(`File downloaded from S3: ${key}`);
       return buffer;
     } catch (error) {
-      logger.error('Failed to download file from S3:', error);
+      logger.error({ error }, 'Failed to download file from S3');
       throw new Error(`S3 download failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
   }
@@ -95,7 +95,7 @@ export class S3Service {
       await client.send(command);
       logger.info(`File deleted from S3: ${key}`);
     } catch (error) {
-      logger.error('Failed to delete file from S3:', error);
+      logger.error({ error }, 'Failed to delete file from S3');
       throw new Error(`S3 delete failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
   }
@@ -114,7 +114,7 @@ export class S3Service {
       const url = await getSignedUrl(client, command, { expiresIn });
       return url;
     } catch (error) {
-      logger.error('Failed to generate presigned URL:', error);
+      logger.error({ error }, 'Failed to generate presigned URL');
       throw new Error(`Presigned URL generation failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
   }

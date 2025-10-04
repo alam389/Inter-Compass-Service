@@ -76,15 +76,15 @@ export async function generateOutline(req: Request, res: Response) {
     
     logger.info(`Outline generated for role: ${requestData.role}, team: ${requestData.teamId}`);
     
-    res.json(outline);
+    return res.json(outline);
   } catch (error) {
-    logger.error('Outline generation failed:', error);
+    logger.error({ error }, 'Outline generation failed');
     
     if (error instanceof z.ZodError) {
       return res.status(400).json({ error: 'Invalid request data', details: error.errors });
     }
     
-    res.status(500).json({ error: 'Failed to generate outline' });
+    return res.status(500).json({ error: 'Failed to generate outline' });
   }
 }
 
@@ -108,7 +108,7 @@ export async function getOutlineHistory(req: Request, res: Response) {
       LIMIT 10
     `, [role, teamId]);
     
-    res.json({
+    return res.json({
       outlines: result.rows.map(row => ({
         id: row.id,
         role: row.role,
@@ -120,7 +120,7 @@ export async function getOutlineHistory(req: Request, res: Response) {
       })),
     });
   } catch (error) {
-    logger.error('Failed to get outline history:', error);
-    res.status(500).json({ error: 'Failed to get outline history' });
+    logger.error({ error }, 'Failed to get outline history');
+    return res.status(500).json({ error: 'Failed to get outline history' });
   }
 }

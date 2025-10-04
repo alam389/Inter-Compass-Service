@@ -2,19 +2,24 @@ import pino from 'pino';
 
 const isDevelopment = process.env.NODE_ENV === 'development';
 
-export const logger = pino({
+const loggerConfig: any = {
   level: process.env.LOG_LEVEL || 'info',
-  transport: isDevelopment ? {
+  formatters: {
+    level: (label: string) => {
+      return { level: label };
+    }
+  }
+};
+
+if (isDevelopment) {
+  loggerConfig.transport = {
     target: 'pino-pretty',
     options: {
       colorize: true,
       translateTime: 'SYS:standard',
       ignore: 'pid,hostname'
     }
-  } : undefined,
-  formatters: {
-    level: (label) => {
-      return { level: label };
-    }
-  }
-});
+  };
+}
+
+export const logger = pino(loggerConfig);

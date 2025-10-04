@@ -24,7 +24,7 @@ export class PDFExtractionService {
       logger.info('PDF text extraction yielded low results, trying OCR...');
       return await this.extractWithOCR(pdfBuffer);
     } catch (error) {
-      logger.error('PDF extraction failed:', error);
+      logger.error({ error }, 'PDF extraction failed');
       throw new Error(`Failed to extract text from PDF: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
   }
@@ -74,7 +74,7 @@ export class PDFExtractionService {
         text: pdfData.text || 'No text could be extracted from this PDF'
       }];
     } catch (error) {
-      logger.error('OCR extraction failed:', error);
+      logger.error({ error }, 'OCR extraction failed');
       throw new Error(`OCR extraction failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
   }

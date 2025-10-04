@@ -105,15 +105,15 @@ export async function chat(req: Request, res: Response) {
     
     logger.info(`Chat response generated for session: ${sessionId}`);
     
-    res.json(response);
+    return res.json(response);
   } catch (error) {
-    logger.error('Chat failed:', error);
+    logger.error({ error }, 'Chat failed');
     
     if (error instanceof z.ZodError) {
       return res.status(400).json({ error: 'Invalid request data', details: error.errors });
     }
     
-    res.status(500).json({ error: 'Chat failed' });
+    return res.status(500).json({ error: 'Chat failed' });
   }
 }
 
@@ -136,7 +136,7 @@ export async function getChatHistory(req: Request, res: Response) {
       ORDER BY created_at ASC
     `, [sessionId]);
     
-    res.json({
+    return res.json({
       sessionId,
       messages: result.rows.map(row => ({
         id: row.id,
@@ -147,8 +147,8 @@ export async function getChatHistory(req: Request, res: Response) {
       })),
     });
   } catch (error) {
-    logger.error('Failed to get chat history:', error);
-    res.status(500).json({ error: 'Failed to get chat history' });
+    logger.error({ error }, 'Failed to get chat history');
+    return res.status(500).json({ error: 'Failed to get chat history' });
   }
 }
 
@@ -169,7 +169,7 @@ export async function getChatSessions(req: Request, res: Response) {
       LIMIT 20
     `, [req.user?.id || 'unknown']);
     
-    res.json({
+    return res.json({
       sessions: result.rows.map(row => ({
         id: row.id,
         createdAt: row.created_at,
@@ -178,7 +178,7 @@ export async function getChatSessions(req: Request, res: Response) {
       })),
     });
   } catch (error) {
-    logger.error('Failed to get chat sessions:', error);
-    res.status(500).json({ error: 'Failed to get chat sessions' });
+    logger.error({ error }, 'Failed to get chat sessions');
+    return res.status(500).json({ error: 'Failed to get chat sessions' });
   }
 }

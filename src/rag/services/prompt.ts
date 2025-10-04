@@ -57,7 +57,7 @@ export class PromptingService {
       logger.info(`Generated outline for role: ${request.role}, team: ${request.teamId}`);
       return outline;
     } catch (error) {
-      logger.error('Failed to generate outline:', error);
+      logger.error({ error }, 'Failed to generate outline');
       throw new Error(`Failed to generate outline: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
   }
@@ -95,7 +95,7 @@ export class PromptingService {
         guardrails
       };
     } catch (error) {
-      logger.error('Failed to generate chat response:', error);
+      logger.error({ error }, 'Failed to generate chat response');
       throw new Error(`Failed to generate chat response: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
   }

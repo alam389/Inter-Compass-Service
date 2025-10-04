@@ -14,7 +14,6 @@ export function getRedis(): Redis {
 export async function initializeRedis(): Promise<void> {
   try {
     redis = new Redis(config.REDIS_URL, {
-      retryDelayOnFailover: 100,
       maxRetriesPerRequest: 3,
       lazyConnect: true,
     });
@@ -23,7 +22,7 @@ export async function initializeRedis(): Promise<void> {
     await redis.ping();
     logger.info('✅ Redis connected successfully');
   } catch (error) {
-    logger.error('❌ Redis connection failed:', error);
+    logger.error({ error }, '❌ Redis connection failed');
     throw error;
   }
 }
