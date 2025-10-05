@@ -7,7 +7,6 @@
     "build": "tsc",
     "start": "node dist/index.js",
     "dev": "nodemon src/index.ts",
-    "postinstall": "npm run build",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -25,10 +24,6 @@
     "url": "https://github.com/alam389/Inter-Compass-Service/issues"
   },
   "homepage": "https://github.com/alam389/Inter-Compass-Service#readme",
-  "engines": {
-    "node": ">=18.0.0",
-    "npm": ">=8.0.0"
-  },
   "dependencies": {
     "@google/generative-ai": "^0.24.1",
     "@types/multer": "^2.0.0",
