@@ -82,4 +82,32 @@ router.post('/documents', async (req, res) => {
     });
   }
 });
+
+router.delete('/documents/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const result = await db.query('DELETE FROM documents WHERE documentid = $1 RETURNING *', [id]);
+    
+    if (result.rowCount === 0) {
+      return res.status(404).json({
+        success: false,
+        error: 'Document not found'
+      });
+    }
+    
+    res.json({
+      success: true,
+      message: 'Document deleted successfully',
+      data: result.rows[0]
+    });
+  } catch (error) {
+    console.error('Error deleting document:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to delete document',
+      message: error instanceof Error ? error.message : 'Unknown error'
+    });
+  }
+});
+
 export default router;
