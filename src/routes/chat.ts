@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { db } from '../database';
-import { geminiConfig } from '../config/gemini';
+import { ragService } from '../services/ragService';
 
 // Simple in-memory chat storage to satisfy frontend while backend DB is WIP
 let messages: Array<{
@@ -26,43 +26,25 @@ router.post('/ask', async (req, res) => {
       });
     }
 
-    // 1. Find relevant documents using simple text search
-    const relevantDocs = await db.query(`
-      SELECT documentid, documenttitle, documentcontent, 
-             ts_rank(to_tsvector('english', documentcontent), plainto_tsquery('english', $1)) as rank
-      FROM documents 
-      WHERE to_tsvector('english', documentcontent) @@ plainto_tsquery('english', $1)
-      ORDER BY rank DESC
-      LIMIT 3
-    `, [question]);
+    console.log(`\n${'─'.repeat(60)}`);
+    console.log(`📨 Chat Request Received`);
+    console.log(`   User ID: ${userId}`);
+    console.log(`   Question: "${question}"`);
+    console.log(`${'─'.repeat(60)}`);
 
-    if (relevantDocs.rows.length === 0) {
-      return res.json({
-        success: true,
-        answer: "I couldn't find any relevant information in the documents to answer your question.",
-        sources: []
-      });
-    }
+    // Use RAG service to answer the question
+    const startTime = Date.now();
+    const ragResponse = await ragService.answerQuestion(question, userId);
+    const responseTime = ((Date.now() - startTime) / 1000).toFixed(2);
 
-    // 2. Prepare context for Gemini
-    const context = relevantDocs.rows.map((doc: any) => 
-      `Document: ${doc.documenttitle}\nContent: ${doc.documentcontent.substring(0, 1000)}...`
-    ).join('\n\n');
-    // 3. Create prompt for Gemini
-    const prompt = `Based on the following documents, please answer the user's question. If the answer is not in the documents, say so.
+    console.log(`✅ Response Generated`);
+    console.log(`   Response Time: ${responseTime}s`);
+    console.log(`   Confidence: ${(ragResponse.confidence * 100).toFixed(1)}%`);
+    console.log(`   Sources: ${ragResponse.sources.length}`);
+    console.log(`   Answer Length: ${ragResponse.answer.length} chars`);
+    console.log(`${'─'.repeat(60)}\n`);
 
-Documents:
-${context}
-
-Question: ${question}
-
-Answer:`;
-
-    // 4. Get Gemini response
-    const geminiResponse = await geminiConfig.getModel().generateContent(prompt);
-    const answer = await geminiResponse.response.text();
-
-    // 5. Store the conversation
+    // Store the conversation
     const userMessage = {
       id: msgSeq++,
       user_id: Number(userId),
@@ -75,7 +57,7 @@ Answer:`;
       id: msgSeq++,
       user_id: Number(userId),
       role: 'assistant' as const,
-      content: answer,
+      content: ragResponse.answer,
       created_at: new Date().toISOString(),
     };
     
@@ -83,16 +65,32 @@ Answer:`;
 
     res.json({
       success: true,
-      answer: answer,
-      sources: relevantDocs.rows.map((doc: any) => ({
-        documentId: doc.documentid,
-        documentTitle: doc.documenttitle,
-        relevance: doc.rank
-      }))
+      answer: ragResponse.answer,
+      confidence: ragResponse.confidence,
+      responseTimeSeconds: parseFloat(responseTime),
+      sources: ragResponse.sources.map(source => ({
+        chunkId: source.chunkId,
+        documentId: source.documentId,
+        documentTitle: source.documentTitle,
+        chunkIndex: source.chunkIndex,
+        relevanceScore: source.relevanceScore,
+        excerpt: source.chunkText.substring(0, 200) + '...',
+        metadata: {
+          author: source.metadata?.author,
+          documentType: source.metadata?.documentType
+        }
+      })),
+      metadata: {
+        sourceCount: ragResponse.sources.length,
+        avgRelevanceScore: ragResponse.sources.length > 0 
+          ? ragResponse.sources.reduce((sum, s) => sum + s.relevanceScore, 0) / ragResponse.sources.length 
+          : 0,
+        topRelevanceScore: ragResponse.sources[0]?.relevanceScore || 0
+      }
     });
 
   } catch (error) {
-    console.error('Error in RAG Q&A:', error);
+    console.error('\n❌ Error in RAG Q&A:', error);
     res.status(500).json({
       success: false,
       error: 'Failed to process question',
