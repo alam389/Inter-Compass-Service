@@ -51,7 +51,7 @@ class GeminiService {
           temperature: config?.temperature ?? 0.7,
           topK: config?.topK ?? 40,
           topP: config?.topP ?? 0.95,
-          maxOutputTokens: config?.maxOutputTokens ?? 1024,
+          maxOutputTokens: config?.maxOutputTokens ?? 4096,
         };
 
         const result = await this.model!.generateContent({
@@ -89,7 +89,7 @@ class GeminiService {
         temperature: config?.temperature ?? 0.7,
         topK: config?.topK ?? 40,
         topP: config?.topP ?? 0.95,
-        maxOutputTokens: config?.maxOutputTokens ?? 1024,
+        maxOutputTokens: config?.maxOutputTokens ?? 4096,
       };
 
       // Normalize history to satisfy Gemini SDK requirements
